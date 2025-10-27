@@ -1,23 +1,18 @@
-# client.py
-
 import socket
 from DES import DES
-import time
 
 # --- Konfigurasi Jaringan Client ---
 SERVER_HOST = '127.0.0.1'
 SERVER_PORT = 8000
 
-# --- Konfigurasi Kriptografi ---
 # Kunci harus 8 karakter dan sama dengan di server!
-SHARED_KEY = "DESKey88" 
-# -------------------------------
+SHARED_KEY = "keamanan" 
 
 # Inisialisasi DES Engine
 des_engine = DES()
 
+# Memulai client TCP.
 def start_client():
-    """Memulai client TCP."""
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     
     try:
@@ -26,33 +21,32 @@ def start_client():
         print("[CLIENT] Berhasil terhubung.")
         print(f"[CLIENT] Kunci Bersama: {SHARED_KEY}")
 
-        # Terima pesan pembuka dari Server (16 karakter heks)
-        initial_ciphertext_hex = client_socket.recv(1024).decode('utf-8').strip()
+        # Terima pesan awal dari server
+        initial_text = client_socket.recv(1024).decode('utf-8').strip()
         
-        if initial_ciphertext_hex:
-            initial_plaintext = des_engine.decrypt(initial_ciphertext_hex, SHARED_KEY)
-            print("-" * 40)
-            print(f"[SERVER (DEKRIPSI)]: '{initial_plaintext}'")
+        if initial_text:
+            print(f"\n[SERVER (DEKRIPSI)]: '{initial_text}'")
             print("-" * 40)
 
         while True:
-            # 1. Client Kirim (enkripsi)
-            message = input("Client Kirim (Plaintext 8 Karakter): ").strip()
+            # 1. Client mengirim data (ter-enkripsi)
+            message = input("Client Kirim (Plaintext 8 Karakter): ")
             
             if len(message) != 8:
                 print("[WARN] Pesan harus 8 karakter. Kirim 'TIDAK 8!' sebagai gantinya.")
                 message = "TIDAK 8!"
             
-            if message.lower() == 'keluar':
+            if message.lower() == 'keluar  ':
                 client_socket.send("keluar".encode('utf-8')) # Kirim sinyal keluar (non-enkripsi)
                 break
             
-            # 2. Enkripsi dan Kirim pesan
+            # 2. Enkripsi dan Kirim data
             ciphertext_hex = des_engine.encrypt(message, SHARED_KEY)
+            print("-" * 40)
             print(f"[CLIENT ENKRIPSI]: Mengirim {ciphertext_hex}...")
             client_socket.send(ciphertext_hex.encode('utf-8'))
 
-            # 3. Terima balasan terenkripsi (ciphertext heksadesimal)
+            # 3. Terima data balasan terenkripsi (ciphertext heksadesimal)
             ciphertext_response_hex = client_socket.recv(1024).decode('utf-8').strip()
             
             if not ciphertext_response_hex or ciphertext_response_hex.lower() == 'keluar':
@@ -63,7 +57,7 @@ def start_client():
                 print(f"[WARN] Data diterima tidak 16 karakter heks: {ciphertext_response_hex}. Diabaikan.")
                 continue
 
-            # 4. Dekripsi balasan
+            # 4. Dekripsi data balasan
             plaintext_response = des_engine.decrypt(ciphertext_response_hex, SHARED_KEY)
             print("-" * 40)
             print(f"Ciphertext: {ciphertext_response_hex}")
