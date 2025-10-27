@@ -2,13 +2,12 @@ import socket
 import threading
 from DES import DES
 
-# --- Konfigurasi Jaringan Server ---
+# Konfigurasi Jaringan Server
 HOST = '127.0.0.1'
 PORT = 8000
 
 # Kunci harus 8 karakter dan sama dengan di client!
 SHARED_KEY = "keamanan"
-# -------------------------------
 
 # Inisialisasi DES Engine
 des_engine = DES()
@@ -28,7 +27,7 @@ def handle_client(conn, addr):
 
     while True:
         try:
-            # 1. Terima data terenkripsi (ciphertext heksadesimal 16 karakter)
+            # 1. Terima data terenkripsi
             ciphertext_hex = conn.recv(1024).decode('utf-8')
             
             if not ciphertext_hex or ciphertext_hex.lower() == 'keluar':

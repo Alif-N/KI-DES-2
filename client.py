@@ -1,7 +1,7 @@
 import socket
 from DES import DES
 
-# --- Konfigurasi Jaringan Client ---
+# Konfigurasi Jaringan Client
 SERVER_HOST = '127.0.0.1'
 SERVER_PORT = 8000
 
@@ -37,7 +37,7 @@ def start_client():
                 message = "TIDAK 8!"
             
             if message.lower() == 'keluar  ':
-                client_socket.send("keluar".encode('utf-8')) # Kirim sinyal keluar (non-enkripsi)
+                client_socket.send("keluar".encode('utf-8'))
                 break
             
             # 2. Enkripsi dan Kirim data
@@ -46,7 +46,7 @@ def start_client():
             print(f"[CLIENT ENKRIPSI]: Mengirim {ciphertext_hex}...")
             client_socket.send(ciphertext_hex.encode('utf-8'))
 
-            # 3. Terima data balasan terenkripsi (ciphertext heksadesimal)
+            # 3. Terima data balasan terenkripsi
             ciphertext_response_hex = client_socket.recv(1024).decode('utf-8').strip()
             
             if not ciphertext_response_hex or ciphertext_response_hex.lower() == 'keluar':
